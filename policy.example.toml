@@ -1,0 +1,25 @@
+# /etc/mail-mcp/policy.toml
+#
+# The settings that could make mail-mcp less safe live here, in a file only root can
+# change. mail-mcp refuses to start if this file (or its directory) is not owned by root
+# or is writable by anyone else. If the file does not exist, the values below are the
+# built-in defaults.
+
+# How many messages each account may send.
+per_minute = 10
+per_day = 100
+
+# The only folders files may be attached from. Hidden files are never attachable.
+attach_dirs = ["~/Documents", "~/Downloads", "~/Desktop", "~/Pictures"]
+
+# Uncomment to switch every changing tool off in a way that cannot be undone without root.
+# read_only = true
+
+# Optional: pin the account list. Once any [[account]] is listed here, mail-mcp refuses to
+# start if ~/.config/mail-mcp/config.toml contains an account that is not listed, or one
+# whose address or provider differs. Add each account after setting it up.
+#
+# [[account]]
+# name = "hotmail"
+# address = "you@hotmail.com"
+# provider = "outlook"
