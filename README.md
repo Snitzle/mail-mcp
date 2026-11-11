@@ -158,15 +158,15 @@ run its commands or query the keyring from a shell:
       "Edit(~/.config/mail-mcp/**)",
       "Read(~/.local/state/mail-mcp/**)",
       "Edit(~/.local/state/mail-mcp/**)",
-      "Edit(/etc/mail-mcp/**)",
-      "Edit(/usr/local/bin/mail-mcp)",
+      "Edit(//etc/mail-mcp/**)",
+      "Edit(//usr/local/bin/mail-mcp)",
       "Edit(~/.local/bin/mail-mcp)",
-      "Bash(mail-mcp:*)",
-      "Bash(/usr/local/bin/mail-mcp:*)",
-      "Bash(secret-tool:*)",
-      "Bash(kwallet-query:*)",
-      "Bash(kwalletcli:*)",
-      "Bash(keyring:*)"
+      "Bash(mail-mcp *)",
+      "Bash(/usr/local/bin/mail-mcp *)",
+      "Bash(secret-tool *)",
+      "Bash(kwallet-query *)",
+      "Bash(kwalletcli *)",
+      "Bash(keyring *)"
     ]
   }
 }
