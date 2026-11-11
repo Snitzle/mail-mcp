@@ -407,7 +407,8 @@ impl Session {
                         .authenticate("XOAUTH2", XOAuth2 { payload, sent: false })
                         .await
                         .map_err(|(e, _)| Error::auth(format!(
-                            "Sign-in to {name} failed ({e}). The user may need to sign in again with: mail-mcp auth {name}"
+                            "The mail server refused to open {name} ({e}). Check that {address} is the mailbox's own address (not a similar one), and that IMAP is switched on in Outlook.com under Settings > Mail > Forwarding and IMAP. If both are right, the user can sign in again with: mail-mcp auth {name}",
+                            address = account.address
                         )))
                 }
             }

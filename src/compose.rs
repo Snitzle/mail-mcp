@@ -789,12 +789,12 @@ mod tests {
     fn account() -> Account {
         Account {
             name: "hotmail".into(),
-            address: "me@hotmail.com".into(),
+            address: "me@example.com".into(),
             provider: Provider::Outlook,
             client_id: Some("01234567-89ab-cdef-0123-456789abcdef".into()),
             display_name: Some("Me Myself".into()),
             signature: Some("Me".into()),
-            aliases: vec!["me@outlook.com".into()],
+            aliases: vec!["me@alias.example".into()],
             save_sent_copy: false,
         }
     }
@@ -813,7 +813,7 @@ mod tests {
         }
     }
 
-    const ORIGINAL: &str = "From: Ann <ann@example.com>\r\nTo: me@hotmail.com, Bob <bob@example.org>\r\nCc: me@outlook.com, carol@example.net\r\nSubject: Lunch\r\nDate: Mon, 5 Jan 2026 10:00:00 +0000\r\nMessage-ID: <orig@example.com>\r\nReferences: <first@example.com>\r\n\r\nShall we?\r\nSecond line\r\n";
+    const ORIGINAL: &str = "From: Ann <ann@example.com>\r\nTo: me@example.com, Bob <bob@example.org>\r\nCc: me@alias.example, carol@example.net\r\nSubject: Lunch\r\nDate: Mon, 5 Jan 2026 10:00:00 +0000\r\nMessage-ID: <orig@example.com>\r\nReferences: <first@example.com>\r\n\r\nShall we?\r\nSecond line\r\n";
 
     fn text_of(bytes: &[u8]) -> String {
         String::from_utf8_lossy(bytes).into_owned()
@@ -848,7 +848,7 @@ mod tests {
 
         let wire = text_of(&out.to_bytes(false).expect("bytes"));
         assert!(
-            wire.contains("From: \"Me Myself\" <me@hotmail.com>"),
+            wire.contains("From: \"Me Myself\" <me@example.com>"),
             "{wire}"
         );
         assert!(wire.contains("To: <ann@example.com>"), "{wire}");
@@ -922,7 +922,7 @@ mod tests {
 
     #[test]
     fn forward_carries_the_original_and_its_attachments_on_request() {
-        let raw = "From: ann@example.com\r\nTo: me@hotmail.com\r\nSubject: Report\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=b\r\n\r\n--b\r\nContent-Type: text/plain\r\n\r\nSee attached\r\n--b\r\nContent-Type: application/pdf\r\nContent-Disposition: attachment; filename=\"../r.pdf\"\r\nContent-Transfer-Encoding: base64\r\n\r\nJVBERi0=\r\n--b--\r\n";
+        let raw = "From: ann@example.com\r\nTo: me@example.com\r\nSubject: Report\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=b\r\n\r\n--b\r\nContent-Type: text/plain\r\n\r\nSee attached\r\n--b\r\nContent-Type: application/pdf\r\nContent-Disposition: attachment; filename=\"../r.pdf\"\r\nContent-Transfer-Encoding: base64\r\n\r\nJVBERi0=\r\n--b--\r\n";
         let original = message::parse(raw.as_bytes()).expect("parse");
         let mut r = request(Mode::Forward);
         r.to = "bob@example.org".into();
@@ -1015,7 +1015,7 @@ mod tests {
 
     #[test]
     fn headers_are_rewritten_without_touching_the_body() {
-        let raw = b"From: me@hotmail.com\r\nBcc: a@example.com,\r\n\tb@example.com\r\nResent-To: x@example.net\r\nSubject: Hi\r\nDate: old\r\n\r\nBcc: this is body text\r\n";
+        let raw = b"From: me@example.com\r\nBcc: a@example.com,\r\n\tb@example.com\r\nResent-To: x@example.net\r\nSubject: Hi\r\nDate: old\r\n\r\nBcc: this is body text\r\n";
         let out = rewrite_headers(
             raw,
             |n| {
@@ -1026,7 +1026,7 @@ mod tests {
         );
         assert_eq!(
             text_of(&out),
-            "Date: new\r\nFrom: me@hotmail.com\r\nSubject: Hi\r\n\r\nBcc: this is body text\r\n"
+            "Date: new\r\nFrom: me@example.com\r\nSubject: Hi\r\n\r\nBcc: this is body text\r\n"
         );
         // Unix line endings and a message with no body.
         let out = rewrite_headers(
@@ -1039,7 +1039,7 @@ mod tests {
 
     #[test]
     fn draft_is_prepared_with_envelope_from_all_recipient_headers() {
-        let raw = "From: me@hotmail.com\r\nTo: ann@example.com\r\nCc: bob@example.org\r\nBcc: secret@example.net\r\nSubject: Plan\r\nDate: Mon, 5 Jan 2026 10:00:00 +0000\r\nMIME-Version: 1.0\r\nContent-Type: text/html\r\n\r\n<p>Visible</p><div style=\"display:none\">hidden</div><a href=\"https://t.example/c\">click</a>\r\n";
+        let raw = "From: me@example.com\r\nTo: ann@example.com\r\nCc: bob@example.org\r\nBcc: secret@example.net\r\nSubject: Plan\r\nDate: Mon, 5 Jan 2026 10:00:00 +0000\r\nMIME-Version: 1.0\r\nContent-Type: text/html\r\n\r\n<p>Visible</p><div style=\"display:none\">hidden</div><a href=\"https://t.example/c\">click</a>\r\n";
         let prepared = prepare_draft(&account(), raw.as_bytes(), true).expect("prepare");
         assert_eq!(
             prepared.recipients,
@@ -1067,7 +1067,7 @@ mod tests {
     fn draft_from_someone_else_is_refused() {
         let raw = "From: boss@example.com\r\nTo: ann@example.com\r\nSubject: x\r\n\r\nbody\r\n";
         assert!(prepare_draft(&account(), raw.as_bytes(), true).is_err());
-        let alias = "From: me@outlook.com\r\nTo: ann@example.com\r\nSubject: x\r\n\r\nbody\r\n";
+        let alias = "From: me@alias.example\r\nTo: ann@example.com\r\nSubject: x\r\n\r\nbody\r\n";
         assert!(prepare_draft(&account(), alias.as_bytes(), true).is_ok());
         let unmarked = prepare_draft(&account(), alias.as_bytes(), false).expect("prepare");
         assert!(unmarked.description.contains("not marked as a draft"));

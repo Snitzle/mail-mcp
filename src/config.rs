@@ -500,7 +500,7 @@ mod tests {
     fn outlook(name: &str) -> Account {
         Account {
             name: name.into(),
-            address: "someone@hotmail.com".into(),
+            address: "someone@example.com".into(),
             provider: Provider::Outlook,
             client_id: Some("01234567-89ab-cdef-0123-456789abcdef".into()),
             display_name: None,
@@ -519,7 +519,7 @@ mod tests {
         for good in [
             "a@b.co",
             "first.last+tag@sub.example.org",
-            "x_y-z@hotmail.co.uk",
+            "x_y-z@mail.example.co.uk",
         ] {
             assert!(validate_address(good).is_ok(), "{good}");
         }
@@ -653,7 +653,7 @@ mod tests {
         let path = dir.path().join("policy.toml");
         fs::write(
             &path,
-            "[[account]]\nname = \"hotmail\"\naddress = \"someone@hotmail.com\"\nprovider = \"outlook\"\n",
+            "[[account]]\nname = \"hotmail\"\naddress = \"someone@example.com\"\nprovider = \"outlook\"\n",
         )
         .expect("write");
         fs::set_permissions(&path, fs::Permissions::from_mode(0o644)).expect("chmod");
@@ -669,7 +669,7 @@ mod tests {
         );
         // The same name pointed at another mailbox.
         let mut redirected = outlook("hotmail");
-        redirected.address = "attacker@hotmail.com".into();
+        redirected.address = "attacker@example.com".into();
         assert!(policy.check_accounts(&[redirected]).is_err());
     }
 

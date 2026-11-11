@@ -274,8 +274,8 @@ mod tests {
     #[test]
     fn xoauth2_payload_has_the_documented_shape() {
         assert_eq!(
-            xoauth2_payload("me@hotmail.com", "tok").as_str(),
-            "user=me@hotmail.com\x01auth=Bearer tok\x01\x01"
+            xoauth2_payload("me@example.com", "tok").as_str(),
+            "user=me@example.com\x01auth=Bearer tok\x01\x01"
         );
     }
 

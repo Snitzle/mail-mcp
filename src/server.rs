@@ -919,7 +919,7 @@ mod tests {
         let settings = Settings {
             accounts: vec![Account {
                 name: "hotmail".into(),
-                address: "me@hotmail.com".into(),
+                address: "me@example.com".into(),
                 provider: Provider::Outlook,
                 client_id: Some("01234567-89ab-cdef-0123-456789abcdef".into()),
                 display_name: None,
@@ -1025,7 +1025,7 @@ mod tests {
             assert_eq!(shown.len(), 1, "{version:?}");
             let dialog = &shown[0];
             assert!(
-                dialog.starts_with("Send this email from account 'hotmail' (me@hotmail.com)"),
+                dialog.starts_with("Send this email from account 'hotmail' (me@example.com)"),
                 "{dialog}"
             );
             assert!(
